@@ -1,0 +1,27 @@
+<template>
+    <lightning-card title="組織の有効期限チェック" icon-name="utility:date_time">
+        <div class="slds-p-around_medium">
+            <p class="slds-text-heading_small slds-m-bottom_small">{expirationMessage}</p>
+
+            <template if:true={isTrialOrg}>
+                <div class="slds-box slds-theme_alt-inverse slds-m-top_small">
+                    **重要**: トライアルは**
+                    <lightning-formatted-date-time 
+                        value={expirationDate} 
+                        year="numeric" 
+                        month="long" 
+                        day="numeric"
+                        hour="2-digit"
+                        minute="2-digit"
+                        time-zone-name="short"></lightning-formatted-date-time>**に終了します。
+                </div>
+            </template>
+
+            <template if:true={error}>
+                <div class="slds-text-color_error slds-m-top_medium">
+                    {error}
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>
