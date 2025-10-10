@@ -20,6 +20,7 @@ export default class Timer extends LightningElement {
             // Slight delay to allow initial render
             setTimeout(() => this.start(), 0);
         }
+        this.showControls = true;
     }
 
     disconnectedCallback() {
@@ -43,6 +44,11 @@ export default class Timer extends LightningElement {
 
     get isPaused() {
         return this.paused;
+    }
+
+    // used by template to avoid invalid "||" parsing on attribute name
+    get isPausedOrIdle() {
+        return this.isPaused || this.isIdle;
     }
 
     get startLabel() {

@@ -1,41 +1,39 @@
 <template>
-    <div class="timer slds-var-p-around_small">
-        <template if:true={label}>
-            <div class="slds-text-title_caps slds-var-m-bottom_xx-small">{label}</div>
-        </template>
+    <lightning-card title={label} icon-name="utility:clock">
+        <div class="slds-p-around_medium">
+            <div class="time slds-text-align_center slds-text-heading_large" data-testid="time">{formattedTime}</div>
 
-        <div class="time slds-text-heading_large" data-testid="time">{formattedTime}</div>
+            <template if:true={showControls}>
+                <div class="slds-var-m-top_small slds-align_absolute-center">
+                    <lightning-button
+                        variant="brand"
+                        label={startLabel}
+                        title="Start"
+                        onclick={handleStart}
+                        class="slds-m-right_x-small"
+                        data-testid="start"
+                    ></lightning-button>
 
-        <template if:true={showControls}>
-            <div class="controls slds-var-m-top_small">
-                <lightning-button
-                    variant="brand"
-                    label={startLabel}
-                    title="Start"
-                    onclick={handleStart}
-                    class="slds-m-right_x-small"
-                    data-testid="start"
-                ></lightning-button>
+                    <lightning-button
+                        variant="neutral"
+                        label="Pause"
+                        title="Pause"
+                        onclick={handlePause}
+                        class="slds-m-right_x-small"
+                        disabled={isPausedOrIdle}
+                        data-testid="pause"
+                    ></lightning-button>
 
-                <lightning-button
-                    variant="neutral"
-                    label="Pause"
-                    title="Pause"
-                    onclick={handlePause}
-                    class="slds-m-right_x-small"
-                    disabled={isPaused || isIdle}
-                    data-testid="pause"
-                ></lightning-button>
-
-                <lightning-button
-                    variant="destructive"
-                    label="Reset"
-                    title="Reset"
-                    onclick={handleReset}
-                    disabled={isIdle}
-                    data-testid="reset"
-                ></lightning-button>
-            </div>
-        </template>
-    </div>
+                    <lightning-button
+                        variant="destructive"
+                        label="Reset"
+                        title="Reset"
+                        onclick={handleReset}
+                        disabled={isIdle}
+                        data-testid="reset"
+                    ></lightning-button>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
 </template>
