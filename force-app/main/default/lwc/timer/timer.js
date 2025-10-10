@@ -2,7 +2,7 @@ import { LightningElement, api } from 'lwc';
 
 export default class Timer extends LightningElement {
     // Public API
-    @api durationSeconds = 60;
+    @api durationSeconds = 600;
     @api autostart = false;
     @api showControls = false;
     @api tickIntervalMs = 1000;
@@ -14,6 +14,12 @@ export default class Timer extends LightningElement {
     started = false;
     paused = false;
 
+    // Settings state
+    isSettingsOpen = false;
+    draftDurationSeconds;
+    draftMessage = '';
+    message = '休憩時間';
+
     connectedCallback() {
         this.resetInternal();
         if (this.autostart) {
@@ -21,6 +27,9 @@ export default class Timer extends LightningElement {
             setTimeout(() => this.start(), 0);
         }
         this.showControls = true;
+        // initialize drafts from current values
+        this.draftDurationSeconds = this.durationSeconds;
+        this.draftMessage = this.message;
     }
 
     disconnectedCallback() {
@@ -67,6 +76,49 @@ export default class Timer extends LightningElement {
     handleReset() {
         this.reset();
     }
+
+    // Settings open/close
+    openSettings = () => {
+        this.draftDurationSeconds = this.durationSeconds;
+        this.draftMessage = this.message;
+        this.isSettingsOpen = true;
+    };
+
+    closeSettings = () => {
+        this.isSettingsOpen = false;
+    };
+
+    handleDurationChange = (event) => {
+        const v = Number(event.detail.value);
+        this.draftDurationSeconds = isNaN(v) || v < 1 ? 1 : Math.floor(v);
+    };
+
+    handleMessageChange = (event) => {
+        this.draftMessage = event.detail.value ?? '';
+    };
+
+    saveSettings = () => {
+        const newDuration = Math.max(1, Number(this.draftDurationSeconds));
+        const newMessage = this.draftMessage || '';
+
+        const durationChanged = newDuration !== this.durationSeconds;
+
+        this.durationSeconds = newDuration;
+        this.message = newMessage;
+
+        // If duration changed, reset timer to new duration
+        if (durationChanged) {
+            this.reset();
+        }
+        this.isSettingsOpen = false;
+
+        // fire event to inform parent about settings change
+        this.dispatchEvent(
+            new CustomEvent('settingschange', {
+                detail: { durationSeconds: this.durationSeconds, message: this.message }
+            })
+        );
+    };
 
     // Public methods (can be called via querySelector from parent if needed)
     @api start() {
