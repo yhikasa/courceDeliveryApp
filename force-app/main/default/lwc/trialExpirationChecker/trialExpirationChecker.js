@@ -1,10 +1,13 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, wire, track } from 'lwc'; // **修正: trackをインポート**
 import getTrialExpirationDate from '@salesforce/apex/OrgInfoController.getTrialExpirationDate';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class TrialExpirationChecker extends LightningElement {
     expirationDate;
     error;
+    
+    // **修正点 1: モーダルの表示状態を管理するプロパティ**
+    @track isModalOpen = false; 
 
     // Apexメソッドの@wireで有効期限を取得
     @wire(getTrialExpirationDate)
@@ -31,8 +34,6 @@ export default class TrialExpirationChecker extends LightningElement {
     // 表示用のラベルを計算
     get expirationMessage() {
         if (this.expirationDate) {
-            // Date型をローカルタイムゾーンに基づいて整形
-//            return `この組織のトライアル有効期限: ${new Date(this.expirationDate).toLocaleDateString()}`;
             return `この組織は ${new Date(this.expirationDate).toLocaleString()} に有効期限切れとなります！`;
         } else if (this.expirationDate === null) {
             return 'トライアル有効期限は設定されていません (Developer Editionまたは購入済組織である可能性があります)。';
@@ -42,5 +43,15 @@ export default class TrialExpirationChecker extends LightningElement {
 
     get isTrialOrg() {
         return this.expirationDate;
+    }
+
+    // **修正点 2: モーダルを開くハンドラ**
+    openSchedulerModal() {
+        this.isModalOpen = true;
+    }
+
+    // **修正点 3: モーダルを閉じるハンドラ**
+    closeSchedulerModal() {
+        this.isModalOpen = false;
     }
 }
