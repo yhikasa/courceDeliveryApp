@@ -1,7 +1,4 @@
 public with sharing class UserInfoController {
-    public UserInfoController() {
-    }
-
     /**
      * 現在のユーザーのメールアドレスを取得します。
      */

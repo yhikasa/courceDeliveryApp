@@ -60,7 +60,7 @@ const CRON_COLUMNS = [
         },
         initialWidth: 50
     },
-    { label: 'ジョブ名(送信日時-メアド)', fieldName: 'Name', type: 'text' },
+    { label: 'ジョブ名 ( 送信日時 - メアド )', fieldName: 'Name', type: 'text' },
 //    { label: '登録実行者', fieldName: 'CreatedByName', type: 'text' },
 //    { label: '申請済み', fieldName: 'CreatedDate', type: 'date', typeAttributes: { 
 //        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -75,11 +75,16 @@ const CRON_COLUMNS = [
 ];
 
 export default class EmailScheduler extends LightningElement {
-    @track offsetValue = 1;     // デフォルトは一週間前
-    @track selectedUnit = '週'; // デフォルトは一週間前
+    @track offsetValue = 7;     // デフォルトは一週間前
+    @track selectedUnit = '日'; // デフォルトは一週間前
     @track emailAddress;
     @track isScheduling = false;
     
+    // メールアドレス編集中
+    // 修正: メールアドレスの編集状態を管理。初期値は 'false' で非活性。
+    @track isEditingEmail = false;
+    @track editEmailLabel = '修正';
+
     // **新規追加プロパティ: 時と分**
     @track scheduleHour = 12;   // デフォルト: 12時 (正午)
     @track scheduleMinute = 0; // デフォルト: 0分
@@ -109,6 +114,43 @@ export default class EmailScheduler extends LightningElement {
             // 取得に失敗した場合、初期値は空のままになります
         }
     }
+
+// メールアドレス入力フィールドの状態を制御するゲッター
+    get isEmailInputDisabled() {
+        // isEditingEmail が true のとき、入力は可能（disabled=false）。
+        // isEditingEmail が false のとき、入力は不可能（disabled=true）。
+        // HTMLのdisabled属性は真偽値の逆なので注意が必要だが、今回はHTML側の属性バインドを使用。
+        // isEditingEmail が false のときに disabled が true になるようにする。
+        return !this.isEditingEmail; 
+    }
+
+// ★ 新規メソッド: 「修正」/「確認」ボタンの切り替えと処理
+    handleEditEmail() {
+        // 現在編集可能な場合 (ボタンが「確認」の場合)
+        if (this.isEditingEmail) {
+            // ここでバリデーションをトリガーし、成功したら保存/無効化する
+            if (this.validateEmailInput()) {
+                this.editEmailLabel = '修正';
+                this.isEditingEmail = false; // 編集を終了し、入力を非活性化
+                this.showToast('情報', 'メールアドレスの形式を確認しました。', 'success');
+            }
+        } else {
+            // 現在非活性の場合 (ボタンが「修正」の場合)
+            this.isEditingEmail = true; // 編集を開始し、入力を活性化
+            this.editEmailLabel = '確認';
+        }
+    }
+
+    // ★ 新規メソッド: メールアドレス単独のバリデーション
+    validateEmailInput() {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!this.emailAddress || !emailRegex.test(this.emailAddress)) {
+            this.showToast('検証エラー', '有効なメールアドレスを入力してください。', 'warning');
+            return false;
+        }
+        return true;
+    }    
     // 新しいジョブ一覧（CronTrigger）の取得
     @wire(getFilteredScheduledJobs)
     wiredCronJobs(result) {
@@ -137,7 +179,7 @@ export default class EmailScheduler extends LightningElement {
         return [
             { label: '日', value: '日' },
             { label: '週', value: '週' },
-            { label: '月', value: '月' },
+//            { label: '月', value: '月' },
         ];
     }
 
@@ -291,7 +333,7 @@ export default class EmailScheduler extends LightningElement {
                 scheduleMinute: parseInt(this.scheduleMinute, 10)
             });
 
-            this.showToast('成功', 'メール送信スケジュールが登録されました。', 'success');
+            this.showToast('成功', 'メール送信スケジュールを登録しました。', 'success');
 
             refreshApex(this.refreshCronJobs);
         } catch (error) {
@@ -357,7 +399,7 @@ export default class EmailScheduler extends LightningElement {
         // 例: Apex呼び出し
         try {
             await abortJob({ cronTriggerId: cronTriggerId });
-            this.showToast('成功', 'スケジュールジョブが削除されました。', 'success');
+            this.showToast('成功', 'スケジュールジョブを削除しました。', 'success');
             // データテーブルを再読み込み
             refreshApex(this.refreshCronJobs);
         } catch (error) {

@@ -15,6 +15,7 @@ public with sharing class EmailSchedulerController {
     /*
     EmailSchedulerController.scheduleEmail(7, '日', 'yhikasa@salesforce.com');
 //    
+    
     */
 
     @AuraEnabled
@@ -59,6 +60,34 @@ public with sharing class EmailSchedulerController {
         EmailSenderJob job = new EmailSenderJob(recipientEmail);
         return System.schedule(jobName, cronExp, job);
     }
+
+    // 3. 現在のApexジョブ一覧を取得するメソッド
+    @AuraEnabled(cacheable=true)
+    public static List<AsyncApexJob> getScheduledJobs() {
+        return [
+            SELECT 
+                CompletedDate, // 完了日
+                JobType,       // ジョブ種別
+                Status,        // 状況
+                ExtendedStatus, // 状況の詳細
+                TotalJobItems,  // 合計バッチ数
+                NumberOfErrors, // 失敗
+                ApexClass.Name, // Apex クラス
+                CreatedBy.Name, // 登録実行者 (登録者)
+                ApexClass.ApiVersion,
+                MethodName,     // Apex メソッド
+                JobItemsProcessed // 一括処理済み
+            FROM 
+                AsyncApexJob
+            WHERE
+                JobType = 'ScheduledApex'
+            ORDER BY 
+                CreatedDate DESC
+            LIMIT 
+                20
+        ];
+    }
+    // EmailSchedulerController.cls に以下のメソッドを追加
 
     /**
      * emailSchedulerで登録されたスケジュールジョブ (CronTrigger) の一覧を取得

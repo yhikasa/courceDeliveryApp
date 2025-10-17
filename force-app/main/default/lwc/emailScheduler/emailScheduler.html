@@ -7,7 +7,7 @@
 
                 <lightning-layout-item size="12" class="slds-p-around_small">
                     <div class="slds-text-body_regular slds-text-heading_small">
-                        <p>{expirationMessage} 登録ボタンを押下すると、 {offsetValue}{selectedUnit}前 ({scheduledDateTime}) にメール通知を行います。
+                        <p>{expirationMessage} 登録ボタンを押下すると、 {offsetValue}{selectedUnit}前 ({scheduledDateTime}) にメールを送信します。
                         </p>
                     </div>
                 </lightning-layout-item>
@@ -19,24 +19,33 @@
                         data-field="email"
                         value={emailAddress}
                         onchange={handleInputChange}
-                        disabled="true"
+                        disabled={isEmailInputDisabled}
                         required
                     ></lightning-input>
                 </lightning-layout-item>
 
+                <lightning-layout-item size="1" class="slds-p-around_small">
+                    <lightning-button
+                        label={editEmailLabel}
+                        variant="base"
+                        onclick={handleEditEmail}
+                        disabled={isScheduling}
+                        title="メールアドレスの修正"
+                    ></lightning-button>
+                </lightning-layout-item>
 
                 <template if:false={isTimeSettingEnabled}>
-                    <lightning-layout-item size="6" class="slds-p-around_small">
+                    <lightning-layout-item size="4" class="slds-p-around_small">
                         <div class="slds-text-body_regular slds-text-heading_small">
                                 <p>メール送信日時　{scheduledDateTime}</p>
                         </div>
                     </lightning-layout-item>
                 </template>
                 <template if:true={isTimeSettingEnabled}>
-                    <lightning-layout-item size="2" padding="around-small">
+                    <lightning-layout-item size="1" padding="around-small">
                         <lightning-input
                             type="number"
-                            label="通知までの日数/週数/月数"
+                            label="日/週数"
                             data-field="offset"
                             value={offsetValue}
                             onchange={handleInputChange}
@@ -44,7 +53,7 @@
                         ></lightning-input>
                     </lightning-layout-item>
 
-                    <lightning-layout-item size="2" padding="around-small">
+                    <lightning-layout-item size="1" padding="around-small">
                         <lightning-combobox
                             label="単位"
                             data-field="unit"
@@ -90,17 +99,18 @@
                             label="日時変更"
                             onchange={handleTimeToggle}
                             checked={isTimeSettingEnabled}
-                            message-toggle-active=""
-                            message-toggle-inactive="">
+                            message-toggle-active="ON"
+                            message-toggle-inactive="OFF">
                         ></lightning-input>
                     </div>
                 </lightning-layout-item>
-                <lightning-layout-item size="1" class="slds-p-around_small">
+                <lightning-layout-item size="2" class="slds-p-around_small">
                     <lightning-button
                         label="登録"
                         variant="brand"
                         onclick={handleRegister}
                         disabled={isScheduling}
+                        icon-name="utility:email"
                         title="スケジュールを登録します"
                     ></lightning-button>
                 </lightning-layout-item>
@@ -109,28 +119,7 @@
         </div>
     </lightning-card>
 
-
-
-    <!-- lightning-card title="現在のスケジュールジョブ一覧" icon-name="utility:list">
-        <template if:true={scheduledJobs}>
-            <div class="slds-p-around_medium">
-                <lightning-datatable
-                    key-field="Id"
-                    data={scheduledJobs}
-                    columns={columns}
-                    hide-checkbox-column="true"
-                    show-row-number-column="true"
-                ></lightning-datatable>
-            </div>
-        </template>
-        <template if:true={jobsError}>
-            <div class="slds-text-color_error slds-p-around_medium">
-                {jobsError}
-            </div>
-        </template>
-    </lightning-card -->
-
-    <lightning-card title="メール送信スケジュール" icon-name="utility:list">
+    <lightning-card title="メール送信スケジュール" icon-name="utility:date_time">
         <template if:true={scheduledCronJobs}>
             <div class="slds-p-around_medium">
                 <lightning-datatable
