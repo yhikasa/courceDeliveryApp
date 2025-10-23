@@ -5,6 +5,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class TrialExpirationChecker extends LightningElement {
     expirationDate;
     error;
+    errorTitle;
     
     // **修正点 1: モーダルの表示状態を管理するプロパティ**
     @track isModalOpen = false; 
@@ -16,7 +17,8 @@ export default class TrialExpirationChecker extends LightningElement {
             this.expirationDate = data;
             this.error = undefined;
         } else if (error) {
-            this.error = '有効期限の取得中にエラーが発生しました。';
+            this.error = error;
+            this.errorTitle = '有効期限の取得中にエラーが発生しました。';
             this.expirationDate = undefined;
             console.error('Apex Error:', error);
             
