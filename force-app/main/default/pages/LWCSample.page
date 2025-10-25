@@ -1,0 +1,48 @@
+<apex:page >
+<!-- 
+参考にしたWebサイト
+ 【Salesforce】VFページにLWCを表示する方法
+	https://seiri-blog.github.io/posts/salesforce-vfpage-display-lwc/
+ Lightning Outを利用してVisualforceページから利用する（開発者向け、PC向き）
+	https://www.co-meeting.co.jp/products/cm-kanbanboard-for-salesforce/cm-kanbanboard-for-salesforce-knowledge-base/cm-kanbanboard-for-salesforce-lightning-out-for-vfp/
+-->
+    <apex:includeLightning />
+    <div id="timer"/>
+    <div id="lightningvf" />
+	
+    <script>
+        $Lightning.use("c:lwcvf", function() {
+          $Lightning.createComponent("c:sample",
+                                     {  }, //パラメータなし
+                                     "lightningvf", // div の id
+                                     function(cmp) { // コールバック関数
+                console.log("コンポーネントを読み込みました！");　//処理
+                // do some stuff
+              }
+          );
+        });
+
+        $Lightning.use("c:lwcvf", function() {
+          $Lightning.createComponent("c:timer",
+                                     {  }, //パラメータなし
+                                     "timer", // div の id
+                                     function(cmp) { // コールバック関数
+                console.log("timerコンポーネントを読み込みました！");　//処理
+                // do some stuff
+              }
+          );
+        });
+    /*
+        $Lightning.use("c:lwcvf", function() {
+          $Lightning.createComponent("lightning:button",
+              { label : "Press Me!" },
+              "lightningvf",
+              function(cmp) {
+                console.log("button was created");
+                // do some stuff
+              }
+          );
+        });
+      */
+    </script>
+</apex:page>

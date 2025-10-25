@@ -36,7 +36,7 @@ export default class TrialExpirationChecker extends LightningElement {
     // 表示用のラベルを計算
     get expirationMessage() {
         if (this.expirationDate) {
-            return `この組織は ${new Date(this.expirationDate).toLocaleString()} に有効期限切れとなります！`;
+            return `${new Date(this.expirationDate).toLocaleString()} です！`;
         } else if (this.expirationDate === null) {
             return 'トライアル有効期限は設定されていません (Developer Editionまたは購入済組織である可能性があります)。';
         }
